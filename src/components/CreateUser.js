@@ -1,10 +1,9 @@
 // Importa los módulos necesarios de React y Firebase
-import { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import { collection, addDoc } from "firebase/firestore";
 import { db } from "../fireBaseConfig/firebase";
-import { useNavigate, useParams } from "react-router-dom";
 
-const Edit = () => {
+const CreateUser = () => {
   // Estados para los campos del formulario
   const [userName, setNameUser] = useState("");
   const [lastName, setLastName] = useState("");
@@ -13,55 +12,50 @@ const Edit = () => {
   const [dni, setDni] = useState("");
   const [country, setCountry] = useState("");
   const [phone, setPhone] = useState("");
+  const [created_at, setCreated] = useState("");
   const [updated_at, setUpdated] = useState("");
 
-  const navigate = useNavigate();
-  const {id} = useParams();
+  // Función para manejar el envío del formulario
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Evitar que el formulario se envíe
 
-  const updateUser = async (e) => {
-    e.preventDefault(); // Evitar que el formulario se envíe
-    const user = doc(db, "users", id);
-    const data = {
-      userName: userName,
-      lastName: lastName,
-      address: address,
-      mail: mail,
-      dni: dni,
-      country: country,
-      phone: phone,
-      updated_at: new Date(),
-    };
-    await updateDoc(user, data);
-    navigate("/users");
-  };
+    try {
+      // Agregar datos a Firestore
+      const docRef = await addDoc(collection(db, "users"), {
+        userName: userName,
+        lastName: lastName,
+        address: address,
+        mail: mail,
+        dni: dni,
+        country: country,
+        phone: phone,
+        created_at: new Date(),
+        updated_at: updated_at,
+      });
+      console.log("Documento agregado con ID: ", docRef.id);
 
-  const getUserById = async (id) => {
-    const user = await getDoc(doc(db, "users", id));
-    if (user.exists()) {
-      setNameUser(user.data().userName);
-      setLastName(user.data().lastName);
-      setAddress(user.data().address);
-      setMail(user.data().mail);
-      setDni(user.data().dni);
-      setCountry(user.data().country);
-      setPhone(user.data().phone);
-      setUpdated(user.data().updated_at);
-    } else {
-      console.log("Usuario no encontrado");
+      // Limpiar el formulario después de agregar
+      setNameUser("");
+      setLastName("");
+      setAddress("");
+      setMail("");
+      setDni("");
+      setCountry("");
+      setPhone("");
+      setCreated("");
+      setUpdated("");
+      // Limpia más estados aquí si es necesario para otros campos
+    } catch (e) {
+      console.error("Error al agregar documento: ", e);
     }
   };
-
-  useEffect(() => {
-    getUserById(id);
-    // eslint-disable-next-LINE
-  }, []);
 
   return (
     <>
       <div>
-        <h1 className="text-center mt-5">Editar Usuario</h1>
+        <h1 className="text-center mt-5">Agregar Usuario</h1>
       </div>
-      <form onSubmit={updateUser} className="container mt-5">
+      <form onSubmit={handleSubmit} className="container mt-5">
         <div className="input-group mb-3">
           <span className="input-group-text" id="inputGroup-sizing-default">
             Nombre
@@ -155,11 +149,12 @@ const Edit = () => {
         </div>
         <div className="d-grid gap-2 col-6 mx-auto">
           <button type="submit" className="btn btn-primary">
-            Actualizar Usuario
+            Agregar Usuario
           </button>
         </div>
       </form>
     </>
   );
 };
-export default Edit;
+
+export default CreateUser;
