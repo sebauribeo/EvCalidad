@@ -1,37 +1,50 @@
-// Importa los módulos necesarios de React y Firebase
+// IMPORTA LOS MÓDULOS NECESARIOS DE REACT Y FIREBASE
 import { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../fireBaseConfig/firebase";
 import { useNavigate, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
+
+const MySwal = withReactContent(Swal);
 const Edit = () => {
-  // Estados para los campos del formulario
+  // ESTADOS PARA LOS CAMPOS DEL FORMULARIO
   const [userName, setNameUser] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
-  const [mail, setMail] = useState("");
+  const [email, setEmail] = useState("");
   const [dni, setDni] = useState("");
   const [country, setCountry] = useState("");
   const [phone, setPhone] = useState("");
   const [updated_at, setUpdated] = useState("");
-
   const navigate = useNavigate();
-  const {id} = useParams();
+  const { id } = useParams();
 
   const updateUser = async (e) => {
-    e.preventDefault(); // Evitar que el formulario se envíe
+    e.preventDefault(); // EVITAR QUE EL FORMULARIO SE ENVÍE
     const user = doc(db, "users", id);
     const data = {
       userName: userName,
       lastName: lastName,
       address: address,
-      mail: mail,
+      email: email,
       dni: dni,
       country: country,
       phone: phone,
       updated_at: new Date(),
     };
     await updateDoc(user, data);
+
+    // ALERTA DE EDICION DE USUARIO EXITOSO
+    MySwal.fire({
+      icon: "success",
+      title: "Usuario Actualizado exitosamente",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+
+    // UNA VEZ ACTUALIZA EL USUARIO REDIRIGE A VISTA USUARIOS
     navigate("/users");
   };
 
@@ -41,7 +54,7 @@ const Edit = () => {
       setNameUser(user.data().userName);
       setLastName(user.data().lastName);
       setAddress(user.data().address);
-      setMail(user.data().mail);
+      setEmail(user.data().email);
       setDni(user.data().dni);
       setCountry(user.data().country);
       setPhone(user.data().phone);
@@ -110,8 +123,8 @@ const Edit = () => {
             className="form-control"
             aria-label="Sizing example input"
             aria-describedby="inputGroup-sizing-default"
-            value={mail}
-            onChange={(e) => setMail(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="input-group mb-3">

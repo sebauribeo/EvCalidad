@@ -1,64 +1,102 @@
 import "./App.css";
-import { Link } from 'react-router-dom'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Users from "./components/Users";
-import CreateUser from "./components/CreateUser";
 import Edit from "./components/Edit";
-import Home from './components/Home'
+import Home from "./components/Home";
+import Login from "./components/Login";
+import { getAuth, signOut } from "firebase/auth";
+import { app } from "./fireBaseConfig/firebase";
+import UserDashboard from "./components/UserDashboard";
+import CreateUser from "./components/CreateUser";
+import Swal from "sweetalert2";
 
+const auth = getAuth(app);
 const App = () => {
+
+  const userSignOut = () => {
+    Swal.fire({
+      icon: "success",
+      title: "Sesión terminada",
+      showConfirmButton: false,
+      timer: 2000,
+    }).then(() => {
+      signOut(auth).then(() => {
+        window.location.href = "/"; // Redirige al usuario a la página de inicio
+      });
+    });
+  };
+
   return (
-    <div className="App">
-    <BrowserRouter>
-      <nav
-        className="navbar bg-dark navbar-expand-lg bg-body-tertiary"
-        data-bs-theme="dark"
-      >
-        <div className="container">
-          <a className="navbar-brand" href="#">
-            Navbar
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
+    <>
+      <BrowserRouter>
+        <div className="App">
+          <nav
+            className="navbar bg-dark navbar-expand-lg bg-body-tertiary"
+            data-bs-theme="dark"
           >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-              <li className="nav-item m-1">
-                <Link to={'/'}>Home</Link>
-              </li>
-              <li className="nav-item m-1">
-                <Link to={'/create'}>Crear Usuario</Link>
-              </li>
-              <li className="nav-item m-1">
-                <Link to={'/users'}>Usuarios</Link>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">
-                  Transaciones
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-      <div>
-      </div>
+            <div className="container">
+              <a className="navbar-brand" href="#">
+                Navbar
+              </a>
+              <button
+                className="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
+                <span className="navbar-toggler-icon"></span>
+              </button>
+              <div
+                className="collapse navbar-collapse"
+                id="navbarSupportedContent"
+              >
+                <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+                  <li className="nav-item m-1">
+                    <Link to={"/"}>Home</Link>
+                  </li>
+                  <li className="nav-item m-1">
+                    <Link to={"/users"}>Usuarios</Link>
+                  </li>
+                  <li className="nav-item m-1">
+                    <Link to={"/login"}>Log In</Link>
+                  </li>
+                  {/* {!role ? (
+                    <li className="nav-item m-1">
+                      <button
+                        onClick={() => userSignOut()}
+                        className="btn btn-danger"
+                      >
+                        Cerrar sesión
+                      </button>
+                    </li>
+                  ) : null} */}
+                  <li className="nav-item m-1">
+                    <button
+                      onClick={() => userSignOut()}
+                      className="btn btn-danger"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
           <Routes>
-            <Route path='/' element={<Home />}/>
-            <Route path='/users' element={<Users />}/>
-            <Route path='/create' element={<CreateUser />}/>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/usersDasboard" element={<UserDashboard />} />
+            <Route path="/create" element={<CreateUser />} />
             <Route path="/edit/:id" element={<Edit />} />
           </Routes>
+        </div>
       </BrowserRouter>
-    </div>
+    </>
   );
 };
 
