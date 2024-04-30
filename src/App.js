@@ -10,9 +10,34 @@ import { app } from "./fireBaseConfig/firebase";
 import UserDashboard from "./components/UserDashboard";
 import CreateUser from "./components/CreateUser";
 import Swal from "sweetalert2";
+import { useState, useEffect  } from "react";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 
+const firestore = getFirestore(app);
 const auth = getAuth(app);
 const App = () => {
+  const [user, setUser] = useState(null);
+  const [getUser, setGetUser] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      const fetchUserName = async () => {
+        const docRef = doc(firestore, `users/${user.uid}`);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setGetUser(docSnap.data());
+        }
+      };
+      fetchUserName();
+    }
+  }, [user]);
 
   const userSignOut = () => {
     Swal.fire({
@@ -59,12 +84,15 @@ const App = () => {
                     <Link to={"/"}>Home</Link>
                   </li>
                   <li className="nav-item m-1">
-                    <Link to={"/users"}>Usuarios</Link>
-                  </li>
-                  <li className="nav-item m-1">
                     <Link to={"/login"}>Log In</Link>
                   </li>
-                  {/* {!role ? (
+                  {user !== null && getUser.role === "admin" ? (
+                        <li className="nav-item m-1">
+                          <Link to={"/users"}>Usuarios</Link>
+                        </li>
+                      
+                  ) : null}
+                  {user ? (
                     <li className="nav-item m-1">
                       <button
                         onClick={() => userSignOut()}
@@ -73,15 +101,7 @@ const App = () => {
                         Cerrar sesión
                       </button>
                     </li>
-                  ) : null} */}
-                  <li className="nav-item m-1">
-                    <button
-                      onClick={() => userSignOut()}
-                      className="btn btn-danger"
-                    >
-                      Cerrar sesión
-                    </button>
-                  </li>
+                  ) : null}
                 </ul>
               </div>
             </div>

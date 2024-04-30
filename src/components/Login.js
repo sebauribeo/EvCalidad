@@ -10,38 +10,46 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 const firestore = getFirestore(app);
 const auth = getAuth(app);
+
 const Login = () => {
   const navigate = useNavigate();
+
   const submithandler = async (e) => {
     e.preventDefault();
     const email = e.target.elements.email.value;
     const password = e.target.elements.password.value;
-    const res = signInWithEmailAndPassword(auth, email, password);
-    let role
-    res
-    .then(async () => {
-        const getUserId = auth.currentUser.uid;
-        const getRol = async () => {
-          const docRef = doc(firestore, `users/${getUserId}`);
-          const getDocUser = await getDoc(docRef);
-          const uidUser = getDocUser.data().role;
-          return uidUser;
-        };
-        role = await getRol(getUserId)
-        role === 'admin' ? navigate('/users') : navigate('/usersDasboard');
-        Swal.fire({
-          icon: "success",
-          title: `Redirigiendo a tu sesion`,
-          showConfirmButton: false,
-          timer: 1500,
-        });
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(async () => {
+        const userId = auth.currentUser.uid;
+        const docRef = doc(firestore, `users/${userId}`);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const userDoc = docSnap.data();
+          const role = userDoc.role;
+
+          role === "admin" ? navigate("/users") : navigate("/usersDasboard");
+
+          Swal.fire({
+            icon: "success",
+            title: `¡Bienvenido, ${userDoc.userName}! Redirigiendo a tu sesión`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Usuario no encontrado",
+            text: "Por favor, verifique sus credenciales",
+          });
+        }
       })
-      .catch((e) => {
+      .catch((error) => {
         Swal.fire({
           icon: "error",
-          title: `Credenciales incorrectas`,
-          showConfirmButton: false,
-          timer: 2500,
+          title: "Error al iniciar sesión",
+          text: error.message,
         });
       });
   };
@@ -49,10 +57,10 @@ const Login = () => {
   return (
     <>
       <div className="mt-5">
-        <h2 className="m-5">Ingresar a sesion</h2>
+        <h2 className="m-5">Ingresar a sesión</h2>
         <form onSubmit={submithandler} className="mx-5 px-5">
           <div className="mb-3">
-            <label for="email" className="form-label">
+            <label htmlFor="email" className="form-label">
               Ingresa tu Mail
             </label>
             <input
@@ -63,7 +71,7 @@ const Login = () => {
             />
           </div>
           <div className="mb-3">
-            <label for="password" className="form-label">
+            <label htmlFor="password" className="form-label">
               Ingresa tu contraseña
             </label>
             <input type="password" className="form-control" id="password" />
