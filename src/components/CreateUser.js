@@ -1,7 +1,7 @@
 // Importa los módulos necesarios de React y Firebase
 import React, { useState } from "react";
-import { collection, addDoc, setDoc, doc, getFirestore } from "firebase/firestore";
-import { app, auth, db } from "../fireBaseConfig/firebase";
+import { setDoc, doc, getFirestore } from "firebase/firestore";
+import { app, auth } from "../fireBaseConfig/firebase";
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -50,8 +50,8 @@ const CreateUser = () => {
         return fireBaseUser;
       });
         
-      const docuRef = doc(fireStore, `users/${infoUser.user.uid}`);
-      setDoc(docuRef, {
+      const newUser = doc(fireStore, `users/${infoUser.user.uid}`);
+      setDoc(newUser, {
         userName: userName,
         lastName: lastName,
         address: address,
@@ -61,6 +61,21 @@ const CreateUser = () => {
         dni: dni,
         country: country,
         phone: phone,
+        created_at: new Date(),
+        updated_at: updated_at,
+      });
+
+      const newUserProducts = doc(fireStore, `userProducts/${infoUser.user.uid}`);
+      setDoc(newUserProducts, {
+        debitId: '',
+        creditId: '',
+        debit: false,
+        credit: false,
+        debitDebt: 0,
+        creditDebt: 0,
+        creditAmount: 0,
+        debitAmount: 0,
+        totalPayment: 0,
         created_at: new Date(),
         updated_at: updated_at,
       });

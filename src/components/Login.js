@@ -29,7 +29,7 @@ const Login = () => {
           const userDoc = docSnap.data();
           const role = userDoc.role;
 
-          role === "admin" ? navigate("/users") : navigate("/usersDasboard");
+          role === "admin" ? navigate("/users") : navigate(`/usersDasboard/${userId}`);
 
           Swal.fire({
             icon: "success",

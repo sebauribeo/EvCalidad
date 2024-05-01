@@ -10,7 +10,7 @@ import { app } from "./fireBaseConfig/firebase";
 import UserDashboard from "./components/UserDashboard";
 import CreateUser from "./components/CreateUser";
 import Swal from "sweetalert2";
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 const firestore = getFirestore(app);
@@ -80,26 +80,34 @@ const App = () => {
                 id="navbarSupportedContent"
               >
                 <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-                  <li className="nav-item m-1">
+                  <li className="nav-item m-2 mt-3">
                     <Link to={"/"}>Home</Link>
                   </li>
-                  <li className="nav-item m-1">
+                  <li className="nav-item m-2 mt-3">
                     <Link to={"/login"}>Log In</Link>
                   </li>
                   {user !== null && getUser.role === "admin" ? (
-                        <li className="nav-item m-1">
-                          <Link to={"/users"}>Usuarios</Link>
-                        </li>
-                      
+                    <li className="nav-item m-2 mt-3">
+                      <Link to={"/users"}>Usuarios</Link>
+                    </li>
+                  ) : null}
+                  {user !== null && getUser.role === "user" ? (
+                    <li className="nav-item m-2 mt-3">
+                      <Link to={`/usersDasboard/${user.uid}`}>Mi sesión</Link>
+                    </li>
                   ) : null}
                   {user ? (
                     <li className="nav-item m-1">
-                      <button
-                        onClick={() => userSignOut()}
-                        className="btn btn-danger"
-                      >
-                        Cerrar sesión
-                      </button>
+                      <div className="rounded-pill text-white bg-dark p-2">
+                        {getUser.userName}
+                        <button
+                          onClick={() => userSignOut()}
+                          type="button"
+                          className="btn btn-danger mx-2 rounded-pill"
+                        >
+                          <i class="fa-solid fa-x"></i>
+                        </button>
+                      </div>
                     </li>
                   ) : null}
                 </ul>
@@ -110,7 +118,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/usersDasboard" element={<UserDashboard />} />
+            <Route path="/usersDasboard/:id" element={<UserDashboard />} />
             <Route path="/create" element={<CreateUser />} />
             <Route path="/edit/:id" element={<Edit />} />
           </Routes>
