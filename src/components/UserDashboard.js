@@ -1,11 +1,72 @@
 import React, { useState, useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../fireBaseConfig/firebase";
 import { useParams } from "react-router-dom";
 
 const UserDashboard = () => {
+  const [transferRut, setTransferRut] = useState("");
+  const [transferAmount, setTransferAmount] = useState("");
+
   const [user, setUser] = useState(null);
   const { userId } = useParams(); // Obtener el parámetro 'userId' de la URL
+
+  const handleTransferClick = async (e) => {
+    e.preventDefault();
+  
+    // Verificar si el RUT y el monto son válidos
+    if (!transferRut || !transferAmount) {
+      alert("Por favor ingresa un RUT y un monto válido.");
+      return;
+    }
+  
+    try {
+      // Obtener el documento del usuario actual (quien realiza la transferencia)
+      const currentUserRef = doc(db, "users", userId);
+      const currentUserDoc = await getDoc(currentUserRef);
+  
+      if (!currentUserDoc.exists()) {
+        alert("Usuario no encontrado.");
+        return;
+      }
+  
+      const currentUserData = currentUserDoc.data();
+      const currentBalance = currentUserData.saldo[0]; // Saldo de la cuenta corriente
+  
+      if (parseInt(transferAmount) > currentBalance) {
+        alert("Saldo insuficiente para realizar la transferencia.");
+        return;
+      }
+  
+      // Actualizar el saldo del usuario actual (quien realiza la transferencia)
+      const updatedCurrentBalance = currentBalance - parseInt(transferAmount);
+  
+      await updateDoc(currentUserRef, {
+        saldo: [updatedCurrentBalance, currentUserData.saldo[0]], // Actualizar solo el saldo de la cuenta corriente
+      });
+  
+      // Buscar al usuario destinatario por su RUT y actualizar su saldo
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("dni", "==", transferRut));
+      console.log(q)
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (doc) => {
+        const destinatarioRef = doc(db, "users", doc.id);
+        const destinatarioData = doc.data();
+        const updatedDestinatarioBalance = destinatarioData.saldo[0] + parseInt(transferAmount);
+
+        await updateDoc(destinatarioRef, {
+          saldo: [updatedDestinatarioBalance, destinatarioData.saldo[0]],
+        });
+
+        console.log("Saldo actualizado para destinatario:", destinatarioRef.id);
+      });
+
+  
+      alert("Transferencia realizada con éxito.");
+    } catch (error) {
+      console.error("Error al realizar la transferencia:", error);
+    }
+  };
 
   const getUserById = async (id) => {
     try {
@@ -36,11 +97,6 @@ const UserDashboard = () => {
   if (!user) {
     return <div>Cargando...</div>; // Muestra "Cargando..." mientras se obtienen los datos del usuario
   }
-
-  const handleTransferClick = async (e) => {
-    e.preventDefault();
-    // Add your transfer logic here
-  };
 
   const handlePayBillClick = async (e) => {
     e.preventDefault();
@@ -99,24 +155,31 @@ const UserDashboard = () => {
           <button className="btn btn-primary">Ver saldo</button>
         </div>
 
-        <div className="col-md-4">
-          <h2>Transferencias de Fondos</h2>
-          <form>
-            <label>Desde:</label>
-            <select>
-              <option value="currentAccount">Cuenta corriente</option>
-              <option value="savingsAccount">Cuenta de ahorro</option>
-              <option value="creditCard">Tarjeta de crédito</option>
-            </select>
-            <br />
-            <label>Hasta:</label>
-            <input type="text" placeholder="Cuenta destino" />
-            <br />
-            <label>Monto:</label>
-            <input type="number" placeholder="Monto a transferir" />
-            <br />
-          </form>
-          <button className="btn btn-primary" onClick={handleTransferClick}>Transferir</button>
+        <div className="container mt-5">
+          <div className="row">
+            <div className="col-md-4">
+              <h2>Transferencia de Fondos</h2>
+              <form>
+                <label>RUT del destinatario:</label>
+                <input
+                  type="text"
+                  value={transferRut}
+                  onChange={(e) => setTransferRut(e.target.value)}
+                />
+                <br />
+                <label>Monto a transferir:</label>
+                <input
+                  type="number"
+                  value={transferAmount}
+                  onChange={(e) => setTransferAmount(e.target.value)}
+                />
+                <br />
+                <button className="btn btn-primary" onClick={handleTransferClick}>
+                  Transferir
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
 
         <div className="col-md-4">
