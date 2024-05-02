@@ -1,6 +1,5 @@
 import "./App.css";
-import { Link } from "react-router-dom";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Users from "./components/Users";
 import Edit from "./components/Edit";
 import Home from "./components/Home";
@@ -81,19 +80,19 @@ const App = () => {
               >
                 <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                   <li className="nav-item m-2 mt-3">
-                    <Link to={"/"}>Home</Link>
+                    <Link className="text-white" to={"/"}>Home</Link>
                   </li>
                   <li className="nav-item m-2 mt-3">
-                    <Link to={"/login"}>Log In</Link>
+                    <Link className="text-white"  to={"/login"}>Log In</Link>
                   </li>
                   {user !== null && getUser.role === "admin" ? (
                     <li className="nav-item m-2 mt-3">
-                      <Link to={"/users"}>Usuarios</Link>
+                      <Link className="text-white"  to={"/users"}>Usuarios</Link>
                     </li>
                   ) : null}
                   {user !== null && getUser.role === "user" ? (
                     <li className="nav-item m-2 mt-3">
-                      <Link to={`/usersDasboard/${user.uid}`}>Mi sesión</Link>
+                      <Link className="text-white"  to={`/usersDasboard/${user.uid}`}>Mi sesión</Link>
                     </li>
                   ) : null}
                   {user ? (
@@ -105,7 +104,7 @@ const App = () => {
                           type="button"
                           className="btn btn-danger mx-2 rounded-pill"
                         >
-                          <i class="fa-solid fa-x"></i>
+                          <i className="fa-solid fa-x"></i>
                         </button>
                       </div>
                     </li>
