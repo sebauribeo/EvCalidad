@@ -13,6 +13,7 @@ import { getAuth } from "firebase/auth";
   appId: "1:366062973229:web:e54309df4f514a42d563a4"
 };*/
 //Credenciales Diego
+/*
 const firebaseConfig = {
   apiKey: "AIzaSyCjN-i8dJX0I8Tt2ijgAWo6-0zxN-Qg3mo",
   authDomain: "backend-aseguramiento-calidad.firebaseapp.com",
@@ -20,8 +21,18 @@ const firebaseConfig = {
   storageBucket: "backend-aseguramiento-calidad.appspot.com",
   messagingSenderId: "410197611386",
   appId: "1:410197611386:web:0eb4936f3de909ae603cc3"
-};
+};*/
 // Initialize Firebase
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqPdogbx1zhn-g1OFPCZZTlsKN0TFV1Ls",
+  authDomain: "calidad-f092b.firebaseapp.com",
+  projectId: "calidad-f092b",
+  storageBucket: "calidad-f092b.appspot.com",
+  messagingSenderId: "413049787517",
+  appId: "1:413049787517:web:b79cce015d8cad7b718d14"
+};
+
 export const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
