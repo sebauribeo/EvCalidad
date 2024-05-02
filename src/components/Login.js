@@ -6,7 +6,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { app } from "../fireBaseConfig/firebase";
 import Swal from "sweetalert2";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, getFirestore} from "firebase/firestore";
 
 const firestore = getFirestore(app);
 const auth = getAuth(app);

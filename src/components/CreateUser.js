@@ -63,6 +63,7 @@ const CreateUser = () => {
         phone: phone,
         created_at: new Date(),
         updated_at: updated_at,
+        saldo: [0, 0], // Agregamos el campo saldo con un array vacío con dos elementos de tipo number, ambos en 0
       });
     }
 

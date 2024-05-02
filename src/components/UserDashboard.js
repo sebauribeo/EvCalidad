@@ -120,92 +120,105 @@ const UserDashboard = () => {
     <div className="container mt-5">
       <div className="row">
         <div className="col-md-4">
-          <h2>Perfil de usuario</h2>
-          <ul>
-            <li>
-              <strong>Nombre:</strong> {user.userName}
-            </li>
-            <li>
-              <strong>Apellido:</strong> {user.lastName}
-            </li>
-            <li>
-              <strong>Correo electrónico:</strong> {user.email}
-            </li>
-            <li>
-              <strong>RUT:</strong> {user.dni}
-            </li>
-            <li>
-              <strong>País:</strong> {user.country}
-            </li>
-            <li>
-              <strong>Teléfono:</strong> {user.phone}
-            </li>
-          </ul>
-          <button className="btn btn-primary">Editar perfil</button>
+          <div className="card">
+            <h2 className="card-title">Perfil de usuario</h2>
+            <ul className="list-group list-group-flush">
+              <li className="list-group-item">
+                <strong>Nombre:</strong> {user.userName}
+              </li>
+              <li className="list-group-item">
+                <strong>Apellido:</strong> {user.lastName}
+              </li>
+              <li className="list-group-item">
+                <strong>Correo electrónico:</strong> {user.email}
+              </li>
+              <li className="list-group-item">
+                <strong>RUT:</strong> {user.dni}
+              </li>
+              <li className="list-group-item">
+                <strong>País:</strong> {user.country}
+              </li>
+              <li className="list-group-item">
+                <strong>Teléfono:</strong> {user.phone}
+              </li>
+            </ul>
+            <button className="btn btn-primary btn-block">Editar perfil</button>
+          </div>
         </div>
-
+  
         <div className="col-md-4">
-          <h2>Consulta de Saldo</h2>
-          <ul>
-            <li>
-              <strong>Cuenta corriente:</strong> {user.saldo[0]}
-            </li>
-            <li>
-              <strong>Cuenta de ahorro:</strong> {user.saldo[1]}
-            </li>
-          </ul>
-          <button className="btn btn-primary">Ver saldo</button>
+          <div className="card">
+            <h2 className="card-title">Consulta de Saldo</h2>
+            <ul className="list-group list-group-flush">
+              <li className="list-group-item">
+                <strong>Cuenta corriente:</strong> {user.saldo[0]}
+              </li>
+              <li className="list-group-item">
+                <strong>Cuenta de ahorro:</strong> {user.saldo[1]}
+              </li>
+            </ul>
+          </div>
         </div>
-
-        <div className="container mt-5">
-          <div className="row">
-            <div className="col-md-4">
-              <h2>Transferencia de Fondos</h2>
-              <form>
+  
+        <div className="col-md-4">
+          <div className="card">
+            <h2 className="card-title">Transferencia de Fondos</h2>
+            <form>
+              <div className="form-group">
                 <label>RUT del destinatario:</label>
                 <input
                   type="text"
                   value={transferRut}
                   onChange={(e) => setTransferRut(e.target.value)}
+                  className="form-control"
                 />
-                <br />
+              </div>
+              <div className="form-group">
                 <label>Monto a transferir:</label>
                 <input
                   type="number"
                   value={transferAmount}
                   onChange={(e) => setTransferAmount(e.target.value)}
+                  className="form-control"
                 />
-                <br />
-                <button className="btn btn-primary" onClick={handleTransferClick}>
-                  Transferir
-                </button>
-              </form>
-            </div>
+              </div>
+              <button className="btn btn-primary btn-block" onClick={handleTransferClick}>
+                Transferir
+              </button>
+            </form>
           </div>
         </div>
-
+  
         <div className="col-md-4">
-          <h2>Pago de Facturas</h2>
-          <form>
-            <label>Tipo de factura:</label>
-            <select>
-              <option value="publicServices">Servicios públicos</option>
-              <option value="creditCard">Tarjeta de crédito</option>
-              <option value="loan">Préstamo</option>
-              <option value="other">Otro</option>
-            </select>
-            <br />
-            <label>Número de factura:</label>
-            <input type="text" placeholder="Número de factura" />
-            <br />
-            <label>Monto a pagar:</label>
-            <input type="number" placeholder="Monto a pagar" />
-            <br />
-            <label>Fecha de vencimiento:</label>
-            <input type="date" placeholder="Fecha de vencimiento" />
-            <br />
-          </form>
-          <button className="btn btn-primary" onClick={handlePayBillClick}>Pagar factura</button>
+          <div className="card">
+            <h2 className="card-title">Pago de Facturas</h2>
+            <form>
+              <div className="form-group">
+                <label>Tipo de factura:</label>
+                <select className="form-control">
+                  <option value="publicServices">Servicios públicos</option>
+                  <option value="creditCard">Tarjeta de crédito</option>
+                  <option value="loan">Préstamo</option>
+                  <option value="other">Otro</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Número de factura:</label>
+                <input type="text" placeholder="Número de factura" className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Monto a pagar:</label>
+                <input type="number" placeholder="Monto a pagar" className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Fecha de vencimiento:</label>
+                <input type="date" placeholder="Fecha de vencimiento" className="form-control" />
+              </div>
+              <button className="btn btn-primary btn-block" onClick={handlePayBillClick}>
+                Pagar factura
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
