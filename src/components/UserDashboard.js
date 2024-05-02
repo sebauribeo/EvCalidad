@@ -45,27 +45,29 @@ const UserDashboard = () => {
       });
   
       // Buscar al usuario destinatario por su RUT y actualizar su saldo
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("dni", "==", transferRut));
-      console.log(q)
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (doc) => {
-        const destinatarioRef = doc(db, "users", doc.id);
-        const destinatarioData = doc.data();
-        const updatedDestinatarioBalance = destinatarioData.saldo[0] + parseInt(transferAmount);
+    const destinatarioQuery = query(collection(db, "users"), where("dni", "==", transferRut));
+    const destinatarioSnapshot = await getDocs(destinatarioQuery);
 
-        await updateDoc(destinatarioRef, {
-          saldo: [updatedDestinatarioBalance, destinatarioData.saldo[0]],
-        });
-
-        console.log("Saldo actualizado para destinatario:", destinatarioRef.id);
-      });
-
-  
-      alert("Transferencia realizada con éxito.");
-    } catch (error) {
-      console.error("Error al realizar la transferencia:", error);
+    if (destinatarioSnapshot.size === 0) {
+      alert("Destinatario no encontrado con el RUT proporcionado.");
+      return;
     }
+
+    // Debería ser solo un documento, actualizar su saldo
+    const destinatarioDoc = destinatarioSnapshot.docs[0];
+    const destinatarioRef = destinatarioDoc.ref;
+    const destinatarioData = destinatarioDoc.data();
+    const updatedDestinatarioBalance = destinatarioData.saldo[0] + parseInt(transferAmount);
+
+    await updateDoc(destinatarioRef, {
+      saldo: [updatedDestinatarioBalance, destinatarioData.saldo[0]],
+    });
+
+    console.log("Saldo actualizado para destinatario:", destinatarioRef.id);
+    alert("Transferencia realizada con éxito.");
+  } catch (error) {
+    console.error("Error al realizar la transferencia:", error);
+  }
   };
 
   const getUserById = async (id) => {
