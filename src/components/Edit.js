@@ -1,15 +1,16 @@
-// IMPORTA LOS MÓDULOS NECESARIOS DE REACT Y FIREBASE
+// Importa los módulos necesarios de react y firebase
 import { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../fireBaseConfig/firebase";
-import { useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import { doc, getDoc, updateDoc } from "firebase/firestore"; // Firestore
+import { db } from "../fireBaseConfig/firebase"; // Configuración de Firebase
+import { useNavigate, useParams } from "react-router-dom"; // Navegación en React Router
+import Swal from "sweetalert2"; // SweetAlert para alertas
+import withReactContent from "sweetalert2-react-content"; // Integración de SweetAlert con React
 
-
+// Configura SweetAlert con React
 const MySwal = withReactContent(Swal);
+
 const Edit = () => {
-  // ESTADOS PARA LOS CAMPOS DEL FORMULARIO
+  // Estados para los campos del formulario
   const [userName, setNameUser] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
@@ -18,12 +19,17 @@ const Edit = () => {
   const [country, setCountry] = useState("");
   const [phone, setPhone] = useState("");
   const [updated_at, setUpdated] = useState("");
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const navigate = useNavigate(); // Hook para la navegación en React Router
+  const { id } = useParams(); // Obtiene el parámetro de la URL
 
+  // Función para actualizar un usuario
   const updateUser = async (e) => {
     e.preventDefault(); // EVITAR QUE EL FORMULARIO SE ENVÍE
+
+    // Referencia al documento del usuario en Firestore
     const user = doc(db, "users", id);
+
+    // Datos actualizados del usuario
     const data = {
       userName: userName,
       lastName: lastName,
@@ -34,9 +40,11 @@ const Edit = () => {
       phone: phone,
       updated_at: new Date(),
     };
+
+    // Actualiza el documento del usuario en Firestore
     await updateDoc(user, data);
 
-    // ALERTA DE EDICION DE USUARIO EXITOSO
+    // Alerta de edicion de usuario exitoso
     MySwal.fire({
       icon: "success",
       title: "Usuario Actualizado exitosamente",
@@ -44,13 +52,15 @@ const Edit = () => {
       timer: 1500,
     });
 
-    // UNA VEZ ACTUALIZA EL USUARIO REDIRIGE A VISTA USUARIOS
+    // Una vez actualiza el usuario redirige a vista usuarios
     navigate("/users");
   };
 
+  // Función para obtener los datos del usuario por su ID
   const getUserById = async (id) => {
     const user = await getDoc(doc(db, "users", id));
     if (user.exists()) {
+      // Actualiza los estados con los datos del usuario
       setNameUser(user.data().userName);
       setLastName(user.data().lastName);
       setAddress(user.data().address);
@@ -64,11 +74,13 @@ const Edit = () => {
     }
   };
 
+  // Se ejecuta al cargar el componente, obtiene los datos del usuario por su ID
   useEffect(() => {
     getUserById(id);
-    // eslint-disable-next-LINE
+    // eslint-disable-next-line
   }, []);
 
+  // Renderiza el formulario de edición de usuario
   return (
     <>
       <div>

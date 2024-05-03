@@ -1,16 +1,18 @@
 // Importa los módulos necesarios de React y Firebase
 import React, { useState } from "react";
-import { setDoc, doc, getFirestore } from "firebase/firestore";
-import { app, auth } from "../fireBaseConfig/firebase";
-import { useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { setDoc, doc, getFirestore } from "firebase/firestore"; // Firestore
+import { app } from "../fireBaseConfig/firebase"; // Configuración de Firebase
+import { useNavigate } from 'react-router-dom'; // Navegación en React Router
+import Swal from 'sweetalert2'; // SweetAlert para alertas
+import withReactContent from 'sweetalert2-react-content'; // Integración de SweetAlert con React
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"; // Autenticación de Firebase
 
+// Configura SweetAlert con React
+const MySwal = withReactContent(Swal);
 
-const MySwal = withReactContent(Swal)
+// Define el componente CreateUser
 const CreateUser = () => {
-  // Estados para los campos del formulario
+  // Estados para los campos del formulario y otras variables necesarias
   const [userName, setNameUser] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
@@ -22,14 +24,15 @@ const CreateUser = () => {
   const [phone, setPhone] = useState("");
   const [created_at, setCreated] = useState("");
   const [updated_at, setUpdated] = useState("");
-  const navigate = useNavigate();
-  const fireStore = getFirestore(app)
-
+  const navigate = useNavigate(); // Hook para la navegación en React Router
+  const fireStore = getFirestore(app); // Instancia de Firestore
+  const auth = getAuth(app); // Instancia de Firebase Auth
 
   // Función para manejar el envío del formulario
   const createUser = async (event) => {
     event.preventDefault(); // Evitar que el formulario se envíe
 
+    // Función para crear un usuario en Firebase Authentication y guardar datos adicionales en Firestore
     const createFBUser = async (
       email,
       password,
@@ -42,6 +45,7 @@ const CreateUser = () => {
       phone,
       created_at,
     ) => {
+      // Crea el usuario en Firebase Authentication
       const infoUser = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -49,7 +53,8 @@ const CreateUser = () => {
       ).then((fireBaseUser) => {
         return fireBaseUser;
       });
-        
+      
+      // Crea un documento de usuario en Firestore con datos adicionales
       const newUser = doc(fireStore, `users/${infoUser.user.uid}`);
       setDoc(newUser, {
         userName: userName,
@@ -65,58 +70,64 @@ const CreateUser = () => {
         updated_at: updated_at,
       });
 
+      // Crea un documento para los productos del usuario en Firestore
       const newUserProducts = doc(fireStore, `userProducts/${infoUser.user.uid}`);
       setDoc(newUserProducts, {
         debitId: '',
-        creditId: '',
         debit: false,
+        debitAmount: 0,
+        creditId: '',
         credit: false,
-        debitDebt: 0,
         creditDebt: 0,
         creditAmount: 0,
-        debitAmount: 0,
-        totalPayment: 0,
+        savingAccountId: '',
+        savingAccount: false,
+        savingAccountAmount: 0,
+        totalSavingAccountMovements: 0,
         created_at: new Date(),
         updated_at: updated_at,
       });
     }
 
-      // Limpiar el formulario después de agregar
-      setNameUser('');
-      setLastName('');
-      setAddress('');
-      setEmail('');
-      setRole('',)
-      setDni('');
-      setCountry('');
-      setPhone('');
-      setCreated('');
-      setUpdated('');
+    // Limpiar el formulario después de agregar
+    setNameUser('');
+    setLastName('');
+    setAddress('');
+    setEmail('');
+    setRole('');
+    setDni('');
+    setCountry('');
+    setPhone('');
+    setCreated('');
+    setUpdated('');
 
-      createFBUser(
-        email,
-        password,
-        userName,
-        lastName,
-        address,
-        role,
-        dni,
-        country,
-        phone,
-        created_at,
-      )
-      // UNA VEZ CREA EL USUARIO REDIRIGE A VISTA USUARIOS
-      navigate("/");
+    // Llama a la función para crear el usuario en Firebase y Firestore
+    createFBUser(
+      email,
+      password,
+      userName,
+      lastName,
+      address,
+      role,
+      dni,
+      country,
+      phone,
+      created_at,
+    );
 
-      // ALERTA DE CREACION DE USUARIO EXITOSO
-      MySwal.fire({
-        icon: "success",
-        title: "Usuario creado exitosamente",
-        showConfirmButton: false,
-        timer: 1500
-      });
+    // Una vez crea el usuario redirige a vista usuarios
+    navigate(`/usersDasboard/${auth.currentUser.uid}`);
+
+    // Alerta de creacion de usuario exitoso
+    MySwal.fire({
+      icon: "success",
+      title: "Usuario creado exitosamente",
+      showConfirmButton: false,
+      timer: 1500
+    });
   };
 
+  // Renderiza el formulario
   return (
     <>
       <div>

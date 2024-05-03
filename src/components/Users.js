@@ -1,3 +1,4 @@
+// Importa los módulos necesarios de react y firebase
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
@@ -8,26 +9,26 @@ import withReactContent from "sweetalert2-react-content";
 
 const MySwal = withReactContent(Swal);
 const Users = () => {
-  // CONFIGURACION DE HOOKS
+  // Configuracion de hooks
   const [users, setUsers] = useState([]);
 
-  // REFERENCIA A LA DB DE FIRESTORE
+  // Referencia a la db de firestore
   const usersCollections = collection(db, "users");
 
-  // FUNCION PARA MOSTAR TODOS LOS PRODUCTOS
+  // Funcion para mostar todos los productos
   const getUsersCollection = async () => {
     const data = await getDocs(usersCollections);
     setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
   };
   
-  // FUNCION PARA ELIMINAR UN PRODUCTO
+  // Funcion para eliminar un producto
   const deleteUser = async (id) => {
     const userDeleteDoc = doc(db, "users", id);
     await deleteDoc(userDeleteDoc);
     getUsersCollection();
   };
 
-  // ALERTA DE BORRADO EXITOSO
+  // Alerta de borrado exitoso
   const confirmDelete = (id) => {
     MySwal.fire({
       title: "¿Estas seguro?",
@@ -49,11 +50,13 @@ const Users = () => {
     });
   };
 
-  //USO DE USEEFFECT
+  //Uso de useeffect
   useEffect(() => {
     getUsersCollection();
     // eslint-disable-next-LINE
   }, []);
+
+  // Renderiza la tabla con los usuarios y opciones
   return (
     <>
       <div className="container mt-5">
