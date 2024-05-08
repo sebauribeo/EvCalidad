@@ -7,8 +7,13 @@
   pointer-events: none;
 }
 
-.card-header {
-  background-color: rgba(51, 210, 216, 0.429) !important;
+.logo-img {
+  width: 150px;
+}
+
+.card-header, .modal-header {
+  background-color: rgb(213, 18, 18) !important;
+  color: white !important;
 }
 
 @media (prefers-reduced-motion: no-preference) {

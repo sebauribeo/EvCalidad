@@ -344,7 +344,7 @@ const UserDashboard = (args) => {
           <div>
             <div className="card mt-5">
               <div className="card-header">
-                <h3>
+                <h3 className="text-white">
                   {userName} {lastName}
                 </h3>
               </div>
@@ -368,7 +368,7 @@ const UserDashboard = (args) => {
             <div className="mt-3 col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
               <div className="card">
                 <div className="card-header">
-                  <h3>Debito</h3>
+                  <h3 className="text-white">Debito</h3>
                 </div>
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item h5">
@@ -400,7 +400,7 @@ const UserDashboard = (args) => {
             <div className="mt-3 col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
               <div className="card">
                 <div className="card-header">
-                  <h3>Credito</h3>
+                  <h3 className="text-white">Credito</h3>
                 </div>
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item h5">
@@ -432,7 +432,7 @@ const UserDashboard = (args) => {
             <div className="mt-3 col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
               <div className="card">
                 <div className="card-header">
-                  <h3>Cuenta de ahorro</h3>
+                  <h3 className="text-white">Cuenta de ahorro</h3>
                 </div>
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item h5">
@@ -668,7 +668,7 @@ const UserDashboard = (args) => {
           </div>
           <div className="card m-5">
             <div className="card-header">
-              <h3>Estado de cuentas</h3>
+              <h3 className="text-white">Estado de cuentas</h3>
             </div>
             <ul className="list-group list-group-flush">
               <li className="list-group-item h5">

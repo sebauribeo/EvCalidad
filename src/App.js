@@ -11,6 +11,7 @@ import CreateUser from "./components/CreateUser";
 import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
+import maze from './assets/maze.jpg'
 
 const firestore = getFirestore(app);
 const auth = getAuth(app);
@@ -60,9 +61,9 @@ const App = () => {
             data-bs-theme="dark"
           >
             <div className="container">
-              <a className="navbar-brand" href="#">
-                Navbar
-              </a>
+              <Link className="text-white" to={"/"}>
+                <img className="logo-img" src={maze} alt=""/>
+              </Link>
               <button
                 className="navbar-toggler"
                 type="button"
