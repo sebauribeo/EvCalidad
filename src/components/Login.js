@@ -1,10 +1,12 @@
-// Importa los módulos necesarios de react y firebase
+// Importa los módulos necesarios de react, firebase y rxjs
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // Autenticación de Firebase
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { app } from "../fireBaseConfig/firebase"; // Configuración de Firebase
 import Swal from "sweetalert2"; // SweetAlert para alertas
 import { doc, getDoc, getFirestore } from "firebase/firestore"; // Firestore
+import { from, of } from 'rxjs'; // Importa RxJS
+import { switchMap, catchError, tap } from 'rxjs/operators'; // Importa operadores de RxJS
 
 // Instancias de Firestore y Auth
 const firestore = getFirestore(app);
@@ -14,57 +16,68 @@ const Login = () => {
   const navigate = useNavigate(); // Hook para la navegación en React Router
 
   // Función para manejar el envío del formulario de inicio de sesión
-  const submithandler = async (e) => {
+  const submithandler = (e) => {
     e.preventDefault(); // Evita que el formulario se envíe
 
     // Obtiene el correo electrónico y la contraseña del formulario
     const email = e.target.elements.email.value;
     const password = e.target.elements.password.value;
 
-    // Inicia sesión con correo electrónico y contraseña
-    signInWithEmailAndPassword(auth, email, password)
-      .then(async () => {
+    // Utiliza RxJS para manejar el inicio de sesión y la obtención del documento de usuario
+    from(signInWithEmailAndPassword(auth, email, password)).pipe(
+      switchMap(() => {
         // Obtiene el ID de usuario actual
         const userId = auth.currentUser.uid;
-
-        // Obtiene el documento de usuario correspondiente al ID
         const docRef = doc(firestore, `users/${userId}`);
-        const docSnap = await getDoc(docRef);
+        return from(getDoc(docRef)).pipe(
+          tap((docSnap) => {
+            if (docSnap.exists()) {
+              // Si el usuario existe, obtiene su información
+              const userDoc = docSnap.data();
+              const role = userDoc.role;
 
-        if (docSnap.exists()) {
-          // Si el usuario existe, obtiene su información
-          const userDoc = docSnap.data();
-          const role = userDoc.role;
+              // Redirige según el rol del usuario
+              role === "admin"
+                ? navigate("/users")
+                : navigate(`/usersDashboard/${userId}`);
 
-          // Redirige según el rol del usuario
-          role === "admin"
-            ? navigate("/users")
-            : navigate(`/usersDasboard/${userId}`);
-
-          // Muestra una alerta de inicio de sesión exitoso
-          Swal.fire({
-            icon: "success",
-            title: `¡Bienvenido, ${userDoc.userName}! Redirigiendo a tu sesión`,
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        } else {
-          // Si el usuario no existe, muestra un mensaje de error
-          Swal.fire({
-            icon: "error",
-            title: "Usuario no encontrado",
-            text: "Por favor, verifique sus credenciales",
-          });
-        }
-      })
-      .catch((error) => {
+              // Muestra una alerta de inicio de sesión exitoso
+              Swal.fire({
+                icon: "success",
+                title: `¡Bienvenido, ${userDoc.userName}! Redirigiendo a tu sesión`,
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            } else {
+              // Si el usuario no existe, muestra un mensaje de error
+              Swal.fire({
+                icon: "error",
+                title: "Usuario no encontrado",
+                text: "Por favor, verifique sus credenciales",
+              });
+            }
+          }),
+          catchError((error) => {
+            // Maneja errores al obtener el documento de usuario
+            Swal.fire({
+              icon: "error",
+              title: "Error al obtener los datos del usuario",
+              text: error.message,
+            });
+            return of(null);
+          })
+        );
+      }),
+      catchError((error) => {
         // Maneja errores de inicio de sesión
         Swal.fire({
           icon: "error",
           title: "Error al iniciar sesión",
           text: error.message,
         });
-      });
+        return of(null);
+      })
+    ).subscribe();
   };
 
   // Renderiza el formulario de inicio de sesión
@@ -84,6 +97,7 @@ const Login = () => {
                 <input
                   type="email"
                   className="form-control"
+                  data-testid="email-input"
                   id="email"
                   aria-describedby="emailHelp"
                 />
@@ -92,7 +106,7 @@ const Login = () => {
                 <label htmlFor="password" className="form-label">
                   Ingresa tu contraseña
                 </label>
-                <input type="password" className="form-control" id="password" />
+                <input type="password" className="form-control" id="password" data-testid="password-input"/>
               </div>
               <button type="submit" className="btn btn-primary mt-3">
                 Ingresar a sesión

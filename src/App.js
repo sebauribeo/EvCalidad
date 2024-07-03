@@ -93,7 +93,7 @@ const App = () => {
                   ) : null}
                   {user !== null && getUser.role === "user" ? (
                     <li className="nav-item m-2 mt-3">
-                      <Link className="text-white"  to={`/usersDasboard/${user.uid}`}>Mi sesión</Link>
+                      <Link className="text-white"  to={`/usersDashboard/${user.uid}`}>Mi sesión</Link>
                     </li>
                   ) : null}
                   {user ? (
@@ -118,7 +118,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/usersDasboard/:id" element={<UserDashboard />} />
+            <Route path="/usersDashboard/:id" element={<UserDashboard />} />
             <Route path="/create" element={<CreateUser />} />
             <Route path="/edit/:id" element={<Edit />} />
           </Routes>

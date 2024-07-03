@@ -1,14 +1,15 @@
-// Importa los módulos necesarios de React y Firebase
+// Importa los módulos necesarios de React, Firebase y RxJS
 import React, { useState } from "react";
 import { setDoc, doc, getFirestore } from "firebase/firestore"; // Firestore
 import { app } from "../fireBaseConfig/firebase"; // Configuración de Firebase
 import { useNavigate } from 'react-router-dom'; // Navegación en React Router
 import Swal from 'sweetalert2'; // SweetAlert para alertas
-import withReactContent from 'sweetalert2-react-content'; // Integración de SweetAlert con React
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"; // Autenticación de Firebase
+import { from } from 'rxjs'; // Importa RxJS
+import { switchMap, tap, catchError } from 'rxjs/operators'; // Importa operadores de RxJS
 
 // Configura SweetAlert con React
-const MySwal = withReactContent(Swal);
+// const MySwal = withReactContent(Swal);
 
 // Define el componente CreateUser
 const CreateUser = () => {
@@ -29,11 +30,11 @@ const CreateUser = () => {
   const auth = getAuth(app); // Instancia de Firebase Auth
 
   // Función para manejar el envío del formulario
-  const createUser = async (event) => {
+  const createUser = (event) => {
     event.preventDefault(); // Evitar que el formulario se envíe
 
     // Función para crear un usuario en Firebase Authentication y guardar datos adicionales en Firestore
-    const createFBUser = async (
+    const createFBUser = (
       email,
       password,
       userName,
@@ -46,60 +47,78 @@ const CreateUser = () => {
       created_at,
     ) => {
       // Crea el usuario en Firebase Authentication
-      const infoUser = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      ).then((fireBaseUser) => {
-        return fireBaseUser;
-      });
-      
-      // Crea un documento de usuario en Firestore con datos adicionales
-      const newUser = doc(fireStore, `users/${infoUser.user.uid}`);
-      setDoc(newUser, {
-        userName: userName,
-        lastName: lastName,
-        address: address,
-        email: email,
-        password: password,
-        role: 'user',
-        dni: dni,
-        country: country,
-        phone: phone,
-        created_at: new Date(),
-        updated_at: updated_at,
-      });
+      return from(createUserWithEmailAndPassword(auth, email, password)).pipe(
+        switchMap((fireBaseUser) => {
+          const infoUser = fireBaseUser;
+          // Crea un documento de usuario en Firestore con datos adicionales
+          const newUser = doc(fireStore, `users/${infoUser.user.uid}`);
+          const newUserProducts = doc(fireStore, `userProducts/${infoUser.user.uid}`);
+          
+          return from(setDoc(newUser, {
+            userName: userName,
+            lastName: lastName,
+            address: address,
+            email: email,
+            password: password,
+            role: 'user',
+            dni: dni,
+            country: country,
+            phone: phone,
+            created_at: new Date(),
+            updated_at: updated_at,
+          })).pipe(
+            switchMap(() => from(setDoc(newUserProducts, {
+              debitId: '',
+              debit: false,
+              debitAmount: 0,
+              creditId: '',
+              credit: false,
+              creditDebt: 0,
+              creditAmount: 0,
+              savingAccountId: '',
+              savingAccount: false,
+              savingAccountAmount: 0,
+              totalSavingAccountMovements: 0,
+              created_at: new Date(),
+              updated_at: updated_at,
+            })))
+          );
+        }),
+        tap(() => {
+          // Limpiar el formulario después de agregar
+          setNameUser('');
+          setLastName('');
+          setAddress('');
+          setEmail('');
+          setRole('');
+          setDni('');
+          setCountry('');
+          setPhone('');
+          setCreated('');
+          setUpdated('');
 
-      // Crea un documento para los productos del usuario en Firestore
-      const newUserProducts = doc(fireStore, `userProducts/${infoUser.user.uid}`);
-      setDoc(newUserProducts, {
-        debitId: '',
-        debit: false,
-        debitAmount: 0,
-        creditId: '',
-        credit: false,
-        creditDebt: 0,
-        creditAmount: 0,
-        savingAccountId: '',
-        savingAccount: false,
-        savingAccountAmount: 0,
-        totalSavingAccountMovements: 0,
-        created_at: new Date(),
-        updated_at: updated_at,
-      });
-    }
+          // Una vez crea el usuario redirige a vista usuarios
+          navigate(`/usersDasboard/${auth.currentUser.uid}`);
 
-    // Limpiar el formulario después de agregar
-    setNameUser('');
-    setLastName('');
-    setAddress('');
-    setEmail('');
-    setRole('');
-    setDni('');
-    setCountry('');
-    setPhone('');
-    setCreated('');
-    setUpdated('');
+          // Alerta de creacion de usuario exitoso
+          Swal.fire({
+            icon: "success",
+            title: "Usuario creado exitosamente",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }),
+        catchError((error) => {
+          // Manejo de errores
+          Swal.fire({
+            icon: "error",
+            title: "Error al crear el usuario",
+            text: error.message,
+          });
+          throw error;
+        })
+      ).subscribe();
+    };
 
     // Llama a la función para crear el usuario en Firebase y Firestore
     createFBUser(
@@ -114,17 +133,6 @@ const CreateUser = () => {
       phone,
       created_at,
     );
-
-    // Una vez crea el usuario redirige a vista usuarios
-    navigate(`/usersDasboard/${auth.currentUser.uid}`);
-
-    // Alerta de creacion de usuario exitoso
-    MySwal.fire({
-      icon: "success",
-      title: "Usuario creado exitosamente",
-      showConfirmButton: false,
-      timer: 1500
-    });
   };
 
   // Renderiza el formulario
@@ -142,6 +150,7 @@ const CreateUser = () => {
             type="text"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="userName-input"
             aria-describedby="inputGroup-sizing-default"
             value={userName}
             onChange={(e) => setNameUser(e.target.value)}
@@ -155,6 +164,7 @@ const CreateUser = () => {
             type="text"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="lastName-input"
             aria-describedby="inputGroup-sizing-default"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
@@ -169,6 +179,7 @@ const CreateUser = () => {
             className="form-control"
             aria-label="Sizing example input"
             aria-describedby="inputGroup-sizing-default"
+            data-testid="address-input"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
@@ -181,6 +192,7 @@ const CreateUser = () => {
             type="text"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="email-input"
             aria-describedby="inputGroup-sizing-default"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -194,6 +206,7 @@ const CreateUser = () => {
             type="password"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="password-input"
             aria-describedby="inputGroup-sizing-default"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -207,6 +220,7 @@ const CreateUser = () => {
             type="text"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="dni-input"
             aria-describedby="inputGroup-sizing-default"
             value={dni}
             onChange={(e) => setDni(e.target.value)}
@@ -220,6 +234,7 @@ const CreateUser = () => {
             type="text"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="country-input"
             aria-describedby="inputGroup-sizing-default"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
@@ -233,6 +248,7 @@ const CreateUser = () => {
             type="text"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="phone-input"
             aria-describedby="inputGroup-sizing-default"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
