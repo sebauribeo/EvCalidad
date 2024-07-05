@@ -8,8 +8,6 @@ import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"; // Aute
 import { from } from 'rxjs'; // Importa RxJS
 import { switchMap, tap, catchError } from 'rxjs/operators'; // Importa operadores de RxJS
 
-// Configura SweetAlert con React
-// const MySwal = withReactContent(Swal);
 
 // Define el componente CreateUser
 const CreateUser = () => {

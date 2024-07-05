@@ -4,12 +4,8 @@ import { db } from "../fireBaseConfig/firebase"; // Importar la configuración d
 import { doc, getDoc, updateDoc } from "firebase/firestore"; // Importar funciones de Firestore
 import { useParams } from "react-router-dom"; // Importar useParams para obtener parámetros de la URL
 import { v4 as uuidv4 } from "uuid"; // Importar uuid para generar IDs únicos
-import Swal from "sweetalert2"; // Importar SweetAlert2 para mostrar alertas
 import { Button, Modal, ModalHeader, ModalBody } from "reactstrap"; // Importar Modal de Reactstrap
 import withReactContent from "sweetalert2-react-content"; // Importar SweetAlert2 con soporte para React
-
-// Configurar SweetAlert2 para React
-const MySwal = withReactContent(Swal);
 
 const UserDashboard = (args) => {
   // Definir estados locales para gestionar la información del usuario y sus productos financieros

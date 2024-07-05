@@ -4,10 +4,7 @@ import { Link } from "react-router-dom";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../fireBaseConfig/firebase";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 
-
-const MySwal = withReactContent(Swal);
 const Users = () => {
   // Configuracion de hooks
   const [users, setUsers] = useState([]);
@@ -30,7 +27,7 @@ const Users = () => {
 
   // Alerta de borrado exitoso
   const confirmDelete = (id) => {
-    MySwal.fire({
+    Swal.fire({
       title: "¿Estas seguro?",
       text: "Precaución, esta acción borrara el registro",
       icon: "warning",

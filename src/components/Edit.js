@@ -6,8 +6,6 @@ import { useNavigate, useParams } from "react-router-dom"; // Navegación en Rea
 import Swal from "sweetalert2"; // SweetAlert para alertas
 import withReactContent from "sweetalert2-react-content"; // Integración de SweetAlert con React
 
-// Configura SweetAlert con React
-const MySwal = withReactContent(Swal);
 
 const Edit = () => {
   // Estados para los campos del formulario
@@ -45,7 +43,7 @@ const Edit = () => {
     await updateDoc(user, data);
 
     // Alerta de edicion de usuario exitoso
-    MySwal.fire({
+    Swal.fire({
       icon: "success",
       title: "Usuario Actualizado exitosamente",
       showConfirmButton: false,
@@ -95,6 +93,7 @@ const Edit = () => {
             type="text"
             className="form-control"
             aria-label="Sizing example input"
+            data-testid="name-input"
             aria-describedby="inputGroup-sizing-default"
             value={userName}
             onChange={(e) => setNameUser(e.target.value)}

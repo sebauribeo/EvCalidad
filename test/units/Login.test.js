@@ -1,173 +1,144 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import Login from '../../src/components/Login';
+import React from "react";
+import { render, fireEvent, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import Swal from "sweetalert2";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import Login from "../../src/components/Login"; // Ajustar la ruta según sea necesario
+import { auth, firestore } from "../../src/fireBaseConfig/firebase"; 
 
-// Mock de Firebase, React Router y SweetAlert
-jest.mock('firebase/auth', () => ({
-    getAuth: jest.fn(),
-    signInWithEmailAndPassword: jest.fn(),
-  }));
+// Mock de Firebase y SweetAlert
+jest.mock("firebase/auth", () => ({
+  getAuth: jest.fn(() => ({ currentUser: { uid: "test-uid" } })),
+  signInWithEmailAndPassword: jest.fn(),
+}));
 
-jest.mock('firebase/firestore');
+jest.mock("firebase/firestore", () => ({
+  getFirestore: jest.fn(),
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+}));
 
-// jest.mock('../../src/fireBaseConfig/firebase', () => ({
-//   app: jest.fn(),
-// }));
-
-jest.mock('sweetalert2', () => ({
+jest.mock("sweetalert2", () => ({
   fire: jest.fn(),
 }));
 
 
-  
-describe('Login Component', () => {
-    // let mockAuth;
+describe("Login Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    beforeEach(() => {
-        mockNavigate = jest.fn();
-        jest.mock('react-router-dom', () => ({
-            ...jest.requireActual('react-router-dom'),
-            useNavigate: jest.fn(),
-        }));
-        setDoc.mockResolvedValue({}); 
-        doc.mockResolvedValue({}); 
-        getDoc.mockResolvedValue({})
-        const mockAuth = {
-            currentUser: { uid: '12345', user: 'admin@admin.cl' },
-          };
-        
-        getAuth.mockReturnValue(mockAuth);
-        signInWithEmailAndPassword.mockResolvedValue({});
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
-    test('should render login form', () => {
-        render(
-            <MemoryRouter>
-            <Login />
-            </MemoryRouter>
-        );
-        expect(screen.getByLabelText('Ingresa tu Mail'));
-        expect(screen.getByLabelText('Ingresa tu contraseña'));
-    });
-
-    test('should handle successful login and navigation to admin', async () => {
-        // signInWithEmailAndPassword.mockResolvedValue({});
-        const { getByTestId } = render(
-            <MemoryRouter>
-            <Login />
-            </MemoryRouter>
-        );
-        // useNavigate.mockReturnValue(mockNavigate);
-        doc.mockResolvedValue({
-            exists: () => true,
-            data: () => ({ role: 'admin', userName: 'Admin' }),
-        });
-
-        fireEvent.change(getByTestId('email-input'), { target: { value: 'admin@admin.cl' } });
-        fireEvent.change(getByTestId('password-input'), { target: { value: '1234567890' } });
-        await waitFor(() => {
-            fireEvent.click(screen.getByRole('button', { name: 'Ingresar a sesión' }));
-        });
-
-        
-        await waitFor(() => {
-            expect(signInWithEmailAndPassword).toHaveBeenCalled();
-            // expect(signInWithEmailAndPassword).toHaveBeenCalledWith(getAuth(), 'admin@admin.cl', '1234567890');
-            // expect(Swal.fire).toHaveBeenCalledWith({
-            //     icon: 'success',
-            //     title: '¡Bienvenido, Admin! Redirigiendo a tu sesión',
-            //     showConfirmButton: false,
-            //     timer: 1500,
-            // });
-        });
-    });
-
-// test('should handle successful login and navigation to user dashboard', async () => {
-//     mockSignInWithEmailAndPassword.mockResolvedValue({});
-//     mockGetDoc.mockResolvedValue({
-//       exists: () => true,
-//       data: () => ({ role: 'user', userName: 'Seba' }),
-//     });
-
-//     render(
-//         <MemoryRouter>
-//           <Login />
-//         </MemoryRouter>
-//       );
-  
-//       fireEvent.change(screen.getByLabelText('Ingresa tu Mail'), { target: { value: 'test@test.com' } });
-//       fireEvent.change(screen.getByLabelText('Ingresa tu contraseña'), { target: { value: '1234567890' } });
-//       fireEvent.click(screen.getByRole('button', { name: 'Ingresar a sesión' }));
-
-//       expect(mockSignInWithEmailAndPassword).toHaveBeenCalledTimes(1);
-
-//     // Espera a que el signInWithEmailAndPassword sea llamado
-//     //await waitFor(() => expect(mockSignInWithEmailAndPassword).toHaveBeenCalledWith(auth, 'test@test.com', '1234567890'));
-//     //await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/usersDashboard/USER-UID')); 
-
-//     // await waitFor(() => {
-//     //     expect(Swal.fire).toHaveBeenCalledWith({
-//     //         icon: 'success',
-//     //         title: '¡Bienvenido, Seba! Redirigiendo a tu sesión',
-//     //         showConfirmButton: false,
-//     //         timer: 1500,
-//     //     });
-//     // });
-// });
-
-
-test('should handle login error', async () => {
-    signInWithEmailAndPassword.mockRejectedValue(new Error('Login error'));
-
+  test("renders login form", () => {
     render(
-        <MemoryRouter>
+      <MemoryRouter>
         <Login />
-        </MemoryRouter>
+      </MemoryRouter>
     );
+    expect(screen.getByLabelText("Ingresa tu Mail"));
+    expect(screen.getByLabelText("Ingresa tu contraseña"));
+  });
 
-    fireEvent.change(screen.getByLabelText('Ingresa tu Mail'), { target: { value: 'test@test.cl' } });
-    fireEvent.change(screen.getByLabelText('Ingresa tu contraseña'), { target: { value: '1234567890' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Ingresar a sesión'})); 
+  test("handles successful login and user redirection based on role", async () => {
+    signInWithEmailAndPassword.mockResolvedValueOnce({});
+    getDoc.mockResolvedValueOnce({
+      exists: jest.fn(() => true),
+      data: jest.fn(() => ({ role: "admin", userName: "Test User" })),
+    });
+
+      render( 
+          <MemoryRouter>
+            <Login />
+          </MemoryRouter>
+        );    
+
+        fireEvent.change(screen.getByLabelText('Ingresa tu Mail'), { target: { value: 'test@test.com' } });
+        fireEvent.change(screen.getByLabelText('Ingresa tu contraseña'), { target: { value: '1234567890' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Ingresar a sesión' }));
+
+    await waitFor(() => { 
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        auth,
+        "test@test.com",
+        "1234567890"
+      );
+      expect(doc).toHaveBeenCalledWith(firestore, `users/test-uid`);
+      expect(Swal.fire).toHaveBeenCalledWith({
+        icon: "success",
+        title: `¡Bienvenido, Test User! Redirigiendo a tu sesión`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    });
+  });
+
+  test("handles login error", async () => {
+    const errorMessage = "Login error";
+    signInWithEmailAndPassword.mockRejectedValueOnce(new Error(errorMessage));
+
+    render( 
+        <MemoryRouter>
+          <Login />
+        </MemoryRouter>
+      );    
+
+      fireEvent.change(screen.getByLabelText('Ingresa tu Mail'), { target: { value: 'test@test.com' } });
+      fireEvent.change(screen.getByLabelText('Ingresa tu contraseña'), { target: { value: '1234567890' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Ingresar a sesión' }));
 
     await waitFor(() => {
       expect(Swal.fire).toHaveBeenCalledWith({
-        icon: 'error',
-        title: 'Error al iniciar sesión',
-        text: 'Login error',
+        icon: "error",
+        title: "Error al iniciar sesión",
+        text: errorMessage,
       });
     });
-});
+  });
 
-//   test('should handle user document not found error', async () => {
-//     mockSignInWithEmailAndPassword.mockResolvedValue({});
-//     mockGetDoc.mockResolvedValue({
-//       exists: () => false,
-//     });
+  test("handles user not found error", async () => {
+    signInWithEmailAndPassword.mockResolvedValueOnce({});
+    getDoc.mockResolvedValueOnce({ exists: jest.fn(() => false) });
 
-//     render();
+    render( 
+        <MemoryRouter>
+          <Login />
+        </MemoryRouter>
+      );    
 
-//     fireEvent.change(screen.getByLabelText(/Ingresa tu Mail/i), { target: { value: 'user@example.com' } });
-//     fireEvent.change(screen.getByLabelText(/Ingresa tu contraseña/i), { target: { value: 'password' } });
-//     fireEvent.submit(screen.getByRole('button', { name: /Ingresar a sesión/i }));
+      fireEvent.change(screen.getByLabelText('Ingresa tu Mail'), { target: { value: 'test@test.com' } });
+      fireEvent.change(screen.getByLabelText('Ingresa tu contraseña'), { target: { value: '1234567890' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Ingresar a sesión' }));
 
-//     await waitFor(() => expect(mockSignInWithEmailAndPassword).toHaveBeenCalledWith(auth, 'user@example.com', 'password'));
+    await waitFor(() => {
+      expect(Swal.fire).toHaveBeenCalledWith({
+        icon: "error",
+        title: "Usuario no encontrado",
+        text: "Por favor, verifique sus credenciales",
+      });
+    });
+  });
 
-//     await waitFor(() => {
-//       expect(Swal.fire).toHaveBeenCalledWith({
-//         icon: 'error',
-//         title: 'Usuario no encontrado',
-//         text: 'Por favor, verifique sus credenciales',
-//       });
-//     });
-//   });
+  test("handles user data retrieval error", async () => {
+    signInWithEmailAndPassword.mockResolvedValueOnce({});
+    const errorMessage = "User data retrieval error";
+    getDoc.mockRejectedValueOnce(new Error(errorMessage));
 
+    render( 
+        <MemoryRouter>
+          <Login />
+        </MemoryRouter>
+      );    
+
+      fireEvent.change(screen.getByLabelText('Ingresa tu Mail'), { target: { value: 'test@test.com' } });
+      fireEvent.change(screen.getByLabelText('Ingresa tu contraseña'), { target: { value: '1234567890' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Ingresar a sesión' }));
+
+    await waitFor(() => {
+      expect(Swal.fire).toHaveBeenCalledWith({
+        icon: "error",
+        title: "Error al obtener los datos del usuario",
+        text: errorMessage,
+      });
+    });
+  });
 });
