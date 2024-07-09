@@ -5,7 +5,6 @@ import { doc, getDoc, updateDoc } from "firebase/firestore"; // Importar funcion
 import { useParams } from "react-router-dom"; // Importar useParams para obtener parámetros de la URL
 import { v4 as uuidv4 } from "uuid"; // Importar uuid para generar IDs únicos
 import { Button, Modal, ModalHeader, ModalBody } from "reactstrap"; // Importar Modal de Reactstrap
-import withReactContent from "sweetalert2-react-content"; // Importar SweetAlert2 con soporte para React
 
 const UserDashboard = (args) => {
   // Definir estados locales para gestionar la información del usuario y sus productos financieros

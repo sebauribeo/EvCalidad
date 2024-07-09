@@ -96,7 +96,7 @@ const CreateUser = () => {
           setUpdated('');
 
           // Una vez crea el usuario redirige a vista usuarios
-          navigate(`/usersDasboard/${auth.currentUser.uid}`);
+          navigate(`/usersDashboard/${auth.currentUser.uid}`);
 
           // Alerta de creacion de usuario exitoso
           Swal.fire({

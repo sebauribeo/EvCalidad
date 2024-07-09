@@ -93,6 +93,7 @@ const Users = () => {
                           confirmDelete(user.id);
                         }}
                         className="btn btn-danger"
+                        data-testid={`delete-button-${user.id}`}
                       >
                         <i className="fa-solid fa-trash"></i>
                       </button>

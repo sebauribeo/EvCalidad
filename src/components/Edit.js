@@ -1,5 +1,5 @@
 // Importa los módulos necesarios de react y firebase
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore"; // Firestore
 import { db } from "../fireBaseConfig/firebase"; // Configuración de Firebase
 import { useNavigate, useParams } from "react-router-dom"; // Navegación en React Router
