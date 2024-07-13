@@ -5,6 +5,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore"; // Importar funcion
 import { useParams } from "react-router-dom"; // Importar useParams para obtener parámetros de la URL
 import { v4 as uuidv4 } from "uuid"; // Importar uuid para generar IDs únicos
 import { Button, Modal, ModalHeader, ModalBody } from "reactstrap"; // Importar Modal de Reactstrap
+import Swal from "sweetalert2"; // SweetAlert para alertas
 
 const UserDashboard = (args) => {
   // Definir estados locales para gestionar la información del usuario y sus productos financieros
@@ -90,7 +91,7 @@ const UserDashboard = (args) => {
     await updateDoc(getUserproducts, data);
 
     // Mostrar alerta de éxito y recargar la página
-    MySwal.fire({
+    Swal.fire({
       icon: "success",
       title: "Producto agregado exitosamente",
       showConfirmButton: false,
@@ -112,7 +113,7 @@ const UserDashboard = (args) => {
     await updateDoc(getUserproducts, data);
 
     // Mostrar alerta de éxito y recargar la página
-    MySwal.fire({
+    Swal.fire({
       icon: "success",
       title: "Producto agregado exitosamente",
       showConfirmButton: false,
@@ -133,7 +134,7 @@ const UserDashboard = (args) => {
     await updateDoc(getUserproducts, data);
 
     // Mostrar alerta de éxito y recargar la página
-    MySwal.fire({
+    Swal.fire({
       icon: "success",
       title: "Producto agregado exitosamente",
       showConfirmButton: false,
@@ -156,7 +157,7 @@ const UserDashboard = (args) => {
         debitAmount: updatedDebitAmount,
         updated_at: new Date(),
       });
-      MySwal.fire({
+      Swal.fire({
         icon: "success",
         title: "Saldo agregado exitosamente",
         showConfirmButton: false,
@@ -190,7 +191,7 @@ const UserDashboard = (args) => {
         creditDebt: updatedDebt,
         updated_at: new Date(),
       });
-      MySwal.fire({
+      Swal.fire({
         icon: "success",
         title: "Crédito descontado de tu cupo",
         showConfirmButton: false,
@@ -225,7 +226,7 @@ const UserDashboard = (args) => {
         savingAccountAmount: updatedSavingAcc,
         updated_at: new Date(),
       });
-      MySwal.fire({
+      Swal.fire({
         icon: "success",
         title: "Depósito a tu cuenta exitoso",
         showConfirmButton: false,
@@ -260,7 +261,7 @@ const UserDashboard = (args) => {
         savingAccountAmount: updatedSavingAcc,
         updated_at: new Date(),
       });
-      MySwal.fire({
+      Swal.fire({
         icon: "success",
         title: "Transferencia exitosa",
         showConfirmButton: false,
@@ -311,7 +312,7 @@ const UserDashboard = (args) => {
       });
 
       // Mostrar alerta de éxito y recargar la página
-      MySwal.fire({
+      Swal.fire({
         icon: "success",
         title: "Transferencia exitosa",
         showConfirmButton: false,
